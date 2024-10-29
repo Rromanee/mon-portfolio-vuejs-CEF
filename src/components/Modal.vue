@@ -1,7 +1,6 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 
-// Receive project data as a prop
 const props = defineProps({
   project: Object
 })
@@ -20,7 +19,6 @@ const closeModal = () => {
       <button class="close-button" @click="closeModal">X</button>
       
       <div class="photo-section">
-        <!-- Display images stacked vertically -->
         <img v-for="(img, index) in project.images" 
         :key="index" :src="img" 
         :alt="`Image ${index + 1}`" />

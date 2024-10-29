@@ -1,17 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-// Track the active section
 const activeSection = ref('')
 
-// Function to detect which section is currently in view (scroll detection)
 const handleScroll = () => {
   const sections = document.querySelectorAll('section')
   let currentSection = ''
 
   sections.forEach(section => {
-    const sectionTop = section.offsetTop - 100  // Adjust the offset for better accuracy
-    const sectionBottom = sectionTop + section.offsetHeight // Add height to determine bottom
+    const sectionTop = section.offsetTop - 100 
+    const sectionBottom = sectionTop + section.offsetHeight 
 
     if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
       currentSection = section.getAttribute('id')
@@ -21,17 +19,14 @@ const handleScroll = () => {
   activeSection.value = currentSection
 }
 
-// Set up scroll event listener when the component is mounted
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
 })
 
-// Clean up the scroll event listener when the component is unmounted
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 
-// Function to handle clicks (when user manually clicks a link)
 const setActive = (sectionId) => {
   activeSection.value = sectionId;
   const section = document.getElementById(sectionId);
