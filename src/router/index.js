@@ -7,3 +7,5 @@ const routes = [
     component: Home
   }
 ]
+
+export default router
