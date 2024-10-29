@@ -1,119 +1,115 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 
-// Track the active section
-const activeSection = ref('')
-
-// Function to detect which section is currently in view (scroll detection)
-const handleScroll = () => {
-  const sections = document.querySelectorAll('section')
-  let currentSection = ''
-
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - 100  // Adjust the offset for better accuracy
-    const sectionBottom = sectionTop + section.offsetHeight // Add height to determine bottom
-
-    if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
-      currentSection = section.getAttribute('id')
-    }
-  })
-
-  activeSection.value = currentSection
-}
-
-// Set up scroll event listener when the component is mounted
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+// Receive project data as a prop
+const props = defineProps({
+  project: Object
 })
 
-// Clean up the scroll event listener when the component is unmounted
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
+// Emit an event to close the modal
+const emit = defineEmits(['close'])
 
-// Function to handle clicks (when user manually clicks a link)
-const setActive = (sectionId) => {
-  activeSection.value = sectionId;
-  const section = document.getElementById(sectionId);
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth' });
-  }
+const closeModal = () => {
+  emit('close')
 }
-
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
 </script>
 
 <template>
-  <header class="header">
-    <nav>
-      <a href="#presentation" 
-         class="nav-menu-left" 
-         :class="{ active: activeSection === 'presentation' }" 
-         @click="setActive('presentation')">Présentation</a>
-      <a href="#creations" 
-         class="nav-menu-left" 
-         :class="{ active: activeSection === 'creations' }" 
-         @click="setActive('creations')">Projets</a>
-      <a href="#contact" 
-         class="nav-menu-left" 
-         :class="{ active: activeSection === 'contact' }" 
-         @click="setActive('contact')">Contact</a>
-    </nav>
-    <nav>
-      <a href="#" class="nav-menu-middle" 
-      :class="{ active: activeSection === 'accueil' }" 
-      @click="setActive('accueil')">Accueil</a>
-    </nav>
-    <div class="logo" @click="scrollToTop">
-      <img src="../assets/images/logo.png" alt="Mon Logo" class="circle"/>
+  <div class="modal" @click.self="closeModal">
+    <div class="modal-content">
+      <button class="close-button" @click="closeModal">X</button>
+      
+      <div class="photo-section">
+        <!-- Display images stacked vertically -->
+        <img v-for="(img, index) in project.images" 
+        :key="index" :src="img" 
+        :alt="`Image ${index + 1}`" />
+      </div>
+
+      <div class="details-section">
+        <h2>{{ project.title }}</h2>
+        <p class="date-tech">{{ project.date }} | {{ project.technology }}</p>
+        <p class="description">{{ project.description }}</p>
+        <a :href="project.link" target="_blank">Voir le Project</a>
+      </div>
+      
     </div>
-  </header>
+  </div>
 </template>
 
-<style scoped>  
-.header {
-    background-color: #575D90; 
-    opacity: 0.5;
-    border-radius: 50px;
-    padding: 10px 20px; 
-    margin: 15px 0px;     
-    display: flex;
-    align-items: center;
-    justify-content:space-between;
-    position: sticky;
-    top: 20px;
-    bottom: 50px;
-    z-index: 10;
-}
 
-.nav-menu-left{
-  padding-right: 20px;
-  color: white;
-  text-decoration: none;
-}
-
-.nav-menu-left.active,
-.nav-menu-middle.active{
-  text-decoration: underline; 
-  color: white;
-}
-
-.nav-menu-middle {
+<style scoped>
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  padding-right: 210px;
-  text-decoration: none;
-  color: white;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.logo img {
-  width: 50px; 
+.modal-content {
+  display: flex;
+  background-color: #FFF;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 90%;
+}
+
+.photo-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.photo-section img {
+  width: 100%;
+  max-width: 200px;
   height: auto;
-}
-.logo:hover{
-  cursor: pointer;
-  opacity: 1;
+  border-radius: 4px;
 }
 
+.details-section {
+  flex: 2;
+  padding-left: 20px;
+  color: #333;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.date-tech {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+a {
+  color: #575D90;
+  text-decoration: none;
+}
+
+.close-button {
+  position:absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
 </style>
